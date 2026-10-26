@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const formatDate = (date: Date) => date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+---
+<Base title="Cole Hafner — Blog" description="Posts by Cole Hafner.">
+  <p class="eyebrow">Journal</p>
+  <h1>Cole Hafner</h1>
+  <section aria-label="Posts" class="posts">
+    {posts.map((post) => (
+      <article class="post-row">
+        <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        <div>
+          <h2><a href={`/posts/${post.id}/`}>{post.data.title} <span aria-hidden="true">↗</span></a></h2>
+          <p>{post.data.description}</p>
+          {post.data.tags.length > 0 && <small>{post.data.tags.join(' · ')}</small>}
+        </div>
+      </article>
+    ))}
+    {posts.length === 0 && <p>No posts yet.</p>}
+  </section>
+</Base>
